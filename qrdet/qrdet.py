@@ -20,15 +20,16 @@ from qrdet import _yolo_v8_results_to_dict, _prepare_input, BBOX_XYXY, CONFIDENC
 
 _WEIGHTS_FOLDER = os.path.join(os.path.dirname(__file__), '.model')
 _CURRENT_RELEASE_TXT_FILE = os.path.join(_WEIGHTS_FOLDER, 'current_release.txt')
-_WEIGHTS_URL_FOLDER = 'https://github.com/Eric-Canas/qrdet/releases/download/v2.0_release'
+_WEIGHTS_URL_FOLDER = '../assets/'
 _MODEL_FILE_NAME = 'qrdet-{size}.pt'
 
 
 class QRDetector:
-    def __init__(self, model_size: str = 's', conf_th: float = 0.5, nms_iou: float = 0.3):
+    def __init__(self, weights_path: str = None, model_size: str = 's', conf_th: float = 0.5, nms_iou: float = 0.3):
         """
         Initialize the QRDetector.
         It loads the weights of the YOLOv8 model and prepares it for inference.
+        :param weights_path: str. The path to the weights file. If None, it will use the built-in weights.
         :param model_size: str. The size of the model to use. It can be 'n' (nano), 's' (small), 'm' (medium) or
                                 'l' (large). Larger models are more accurate but slower. Default (and recommended): 's'.
         :param conf_th: float. The confidence threshold to use for the detections. Detection with a confidence lower
@@ -39,10 +40,11 @@ class QRDetector:
         assert model_size in ('n', 's', 'm', 'l'), f'Invalid model size: {model_size}. ' \
                                                    f'Valid values are: \'n\', \'s\', \'m\' or \'l\'.'
         self._model_size = model_size
-        path = self.__download_weights_or_return_path(model_size=model_size)
-        assert os.path.exists(path), f'Could not find model weights at {path}.'
 
-        self.model = YOLO(model=path, task='segment')
+        if weights_path is None:
+            weights_path = os.path.join(os.path.dirname(__file__), 'weights', f'qrdet-{model_size}.pt')
+
+        self.model = YOLO(model=weights_path, task='segment')
 
         self._conf_th = conf_th
         self._nms_iou = nms_iou

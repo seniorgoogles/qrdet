@@ -15,7 +15,6 @@ setup(
     install_requires=[
         'ultralytics',
         'quadrilateral-fitter',
-
         'numpy',
         'requests',
         'tqdm'
@@ -34,4 +33,5 @@ setup(
         'Topic :: Multimedia :: Graphics',
         'Typing :: Typed',
     ],
+    include_package_data=True
 )
